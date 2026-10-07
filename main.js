@@ -1,0 +1,25 @@
+const H=document.querySelector('header'),B=document.getElementById('bar'),N=document.querySelector('nav'),M=document.getElementById('mb');
+const tg=o=>{N.classList.toggle('o',o);M.classList.toggle('o',o);M.setAttribute('aria-expanded',o);document.body.style.overflow=o?'hidden':''};
+M.onclick=()=>tg(!N.classList.contains('o'));N.querySelectorAll('a').forEach(a=>a.onclick=()=>tg(false));addEventListener('keydown',e=>e.key=='Escape'&&tg(false));
+addEventListener('scroll',()=>{H.classList.toggle('sc',scrollY>40);B.style.width=scrollY/Math.max(1,document.body.scrollHeight-innerHeight)*100+'%'},{passive:true});
+const links=[...N.querySelectorAll('a:not(.btn)')];document.querySelectorAll('section[id]').forEach(s=>new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle('on',a.getAttribute('href')=='#'+s.id))}),{rootMargin:'-45% 0px -50% 0px'}).observe(s));
+document.querySelectorAll('[data-tabs]').forEach(t=>{const bs=t.querySelectorAll('.tl button');bs.forEach(b=>b.onclick=()=>{bs.forEach(x=>x.classList.toggle('on',x==b));t.querySelectorAll(':scope>.tp').forEach(p=>p.classList.toggle('on',p.id==b.dataset.t))})});
+document.querySelectorAll('.faq button').forEach(b=>b.onclick=()=>{const f=b.parentNode,d=b.nextElementSibling,o=f.classList.toggle('o');d.style.maxHeight=o?d.scrollHeight+'px':0});
+document.querySelectorAll('.loop').forEach(s=>{const t=s.querySelector('.tr'),o=[...t.children],n=o.length,dots=s.querySelector('.dots');
+o.forEach(()=>dots.append(document.createElement('b')));o.slice().reverse().forEach(c=>t.prepend(c.cloneNode(true)));o.forEach(c=>t.append(c.cloneNode(true)));
+const c=[...t.children];c.forEach((x,i)=>{if(i<n||i>=2*n)x.setAttribute('aria-hidden','true')});
+let st,sw,tm,hold=0;const mk=()=>{st=c[1].offsetLeft-c[0].offsetLeft;sw=st*n},jump=x=>{t.style.scrollSnapType='none';t.scrollLeft=x;t.style.scrollSnapType=''};
+const init=()=>{mk();jump(sw)};init();addEventListener('load',init);addEventListener('resize',init);
+const idx=()=>((Math.round((t.scrollLeft-sw)/st)%n)+n)%n;
+t.addEventListener('scroll',()=>{[...dots.children].forEach((d,i)=>d.classList.toggle('on',i==idx()));clearTimeout(tm);tm=setTimeout(()=>{if(t.scrollLeft<sw-2)jump(t.scrollLeft+sw);else if(t.scrollLeft>=2*sw-2)jump(t.scrollLeft-sw)},140)},{passive:true});
+const go=d=>t.scrollBy({left:d*st,behavior:'smooth'});s.querySelector('.pv').onclick=()=>go(-1);s.querySelector('.nx').onclick=()=>go(1);
+let dn,sx,sl;t.onmousedown=e=>{dn=1;sx=e.pageX;sl=t.scrollLeft;t.style.scrollSnapType='none'};addEventListener('mouseup',()=>{if(dn){dn=0;t.style.scrollSnapType='';t.scrollBy({left:0.01})}});t.onmousemove=e=>{if(dn){e.preventDefault();t.scrollLeft=sl-(e.pageX-sx)}};
+['mouseenter','touchstart','focusin'].forEach(e=>s.addEventListener(e,()=>hold=1,{passive:true}));['mouseleave','touchend','focusout'].forEach(e=>s.addEventListener(e,()=>hold=0,{passive:true}));
+if(!matchMedia('(prefers-reduced-motion:reduce)').matches)setInterval(()=>{if(!hold&&!document.hidden){const r=s.getBoundingClientRect();if(r.top<innerHeight&&r.bottom>0)go(1)}},4500)});
+if(window.gsap&&window.ScrollTrigger&&!matchMedia('(prefers-reduced-motion:reduce)').matches){document.documentElement.classList.add('js');gsap.registerPlugin(ScrollTrigger);
+gsap.from('.hero .k,.hero h1,.hero .hs,.hero .bts',{opacity:0,y:40,duration:1,stagger:.14,ease:'power3.out'});
+gsap.to('.hero .bg',{yPercent:12,ease:'none',scrollTrigger:{trigger:'.hero',scrub:true,start:'top top',end:'bottom top'}});
+gsap.to('.cta .bg',{yPercent:10,ease:'none',scrollTrigger:{trigger:'.cta',scrub:true,start:'top bottom',end:'bottom top'}});
+gsap.to('.pw img',{yPercent:-6,ease:'none',scrollTrigger:{trigger:'.pw',scrub:true}});
+document.querySelectorAll('.rv').forEach(e=>gsap.to(e,{opacity:1,y:0,duration:.9,ease:'power3.out',scrollTrigger:{trigger:e,start:'top 90%'}}));
+document.querySelectorAll('.num').forEach(e=>{const n=+e.dataset.n,o={v:0};ScrollTrigger.create({trigger:e,start:'top 90%',once:true,onEnter:()=>gsap.to(o,{v:n,duration:1.6,ease:'power2.out',onUpdate:()=>e.textContent=Math.round(o.v)})})})}
